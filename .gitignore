@@ -4,3 +4,4 @@
 *.pdf
 *.pt
 models/
+__pycache__/
