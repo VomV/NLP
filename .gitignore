@@ -5,3 +5,4 @@
 *.pt
 models/
 __pycache__/
+data/
