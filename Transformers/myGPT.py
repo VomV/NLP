@@ -5,6 +5,18 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+
+#hyperparameters
+batch_size=32 #how many independent seq to process in parallel
+block_size=8 #sets the size of the context
+max_iters=3000
+eval_interval=300
+learning_rate=1e-3
+device = 'cuda' if torch.is_available() else 'cpu'
+eval_iters=200
+
+
+
 torch.manual_seed(42)
 
 with open('input.txt', 'r', encoding='utf-8') as f:
@@ -50,9 +62,6 @@ for t in range(block_size):
     print(f'context is {context} and target is {target}')
 
 
-torch.manual_seed(43)
-batch_size=4 #how many independent seq to process in parallel
-block_size=8 #sets the size of the context
 
 def get_batch(split):
     '''
@@ -129,11 +138,10 @@ print(loss)
 print(decode(m.generate(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)[0].tolist()))
 #Train the Model
 #Optimizer
-optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
+optimizer = torch.optim.AdamW(m.parameters(), lr=learning_rate)
 
 
-batch_size=32
-for epoch in range(1000):
+for epoch in range(max_iters):
 
     #sample a batch of data 
     xb, yb = get_batch('train')
