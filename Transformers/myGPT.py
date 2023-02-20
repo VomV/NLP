@@ -12,7 +12,7 @@ block_size=8 #sets the size of the context
 max_iters=3000
 eval_interval=300
 learning_rate=1e-3
-device = 'cuda' if torch.is_available() else 'cpu'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters=200
 
 
@@ -147,15 +147,15 @@ class BigramLanguageModel(nn.Module):
 
 
 
-m = BigramLanguageModel(vocab_size)
-out, loss = m(xb,yb)
+model = BigramLanguageModel(vocab_size)
+out, loss = model(xb,yb)
 print(out.shape)
 print(loss)
 
-print(decode(m.generate(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)[0].tolist()))
+print(decode(model.generate(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)[0].tolist()))
 #Train the Model
 #Optimizer
-optimizer = torch.optim.AdamW(m.parameters(), lr=learning_rate)
+optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
 
 for epoch in range(max_iters):
@@ -163,13 +163,13 @@ for epoch in range(max_iters):
     #eval loss on train and val sets
     if epoch % eval_interval == 0:
         losses = estimate_loss()
-        print(f"step: {epoch}, train_loss: {losses['train']}, val_loss: {losses['val']}")
+        print(f"step: {epoch}, train_loss: {losses['train']}, val_loss: {losses['eval']}")
 
     #sample a batch of data 
     xb, yb = get_batch('train')
 
     #eval loss
-    logits, loss = m(xb, yb)
+    logits, loss = model(xb, yb)
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step()
@@ -177,4 +177,4 @@ for epoch in range(max_iters):
 print(loss.item())
 
 
-print(decode(m.generate(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=500)[0].tolist()))
+print(decode(model.generate(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=500)[0].tolist()))
