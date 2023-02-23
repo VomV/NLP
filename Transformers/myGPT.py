@@ -14,6 +14,7 @@ eval_interval=300
 learning_rate=1e-3
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters=200
+vocab_size = 3000
 
 
 
@@ -107,11 +108,11 @@ for b in range(batch_size): #block size
 #BiGram Language Model
 class BigramLanguageModel(nn.Module):
 
-    def __init__(self, vocab_size):
+    def __init__(self):
         super().__init__()
 
         #each token directly reads the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
+        self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
 
     def forward(self, idx, targets=None):
 
@@ -147,7 +148,7 @@ class BigramLanguageModel(nn.Module):
 
 
 
-model = BigramLanguageModel(vocab_size)
+model = BigramLanguageModel()
 out, loss = model(xb,yb)
 print(out.shape)
 print(loss)
