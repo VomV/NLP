@@ -113,11 +113,13 @@ class BigramLanguageModel(nn.Module):
 
         #each token directly reads the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
+        self.lm_head = nn.Linear(n_embed, vocab_size)
 
     def forward(self, idx, targets=None):
 
         #idx and targets are both (Batch ,Time) tensor of integers
-        logits = self.token_embedding_table(idx) # (Batch=batch_size, Time=block_size, Channel=vocab_size)
+        token_emb = self.token_embedding_table(idx) # (Batch=batch_size, Time=block_size, Channel=embed_size)
+        logits = self.lm_head(token_emb) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
 
         if targets is not None:
             B, T, C = logits.shape
