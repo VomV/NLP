@@ -119,6 +119,7 @@ class BigramLanguageModel(nn.Module):
 
         #idx and targets are both (Batch ,Time) tensor of integers
         token_emb = self.token_embedding_table(idx) # (Batch=batch_size, Time=block_size, Channel=embed_size)
+        pos_emb = self.position_embedding_table(torch.arange(T)) #(T,C)
         logits = self.lm_head(token_emb) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
 
         if targets is not None:
