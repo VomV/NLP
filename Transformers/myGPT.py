@@ -104,6 +104,22 @@ for b in range(batch_size): #block size
         print(f"Context:: {context}, Target:: {target}")
 
 
+class Head(nn.Module):
+    '''
+        One head of self-attention   
+    '''
+
+    def __init__(self, head_size):
+        super().__init__()
+        self.key = 
+        self.query = 
+        self.value = 
+        self.register_buffer()
+    
+    def forward(self, x):
+
+
+        return out
 
 #BiGram Language Model
 class BigramLanguageModel(nn.Module):
