@@ -112,8 +112,8 @@ class Head(nn.Module):
     def __init__(self, head_size):
         super().__init__()
         self.key = nn.Linear(n_embed, head_size, bias=False)
-        self.query = 
-        self.value = 
+        self.query = nn.Linear(n_embed, head_size, bias=False)
+        self.value = nn.Linear(n_embed, head_size, bias=False)
         self.register_buffer()
     
     def forward(self, x):
