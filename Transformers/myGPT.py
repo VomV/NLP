@@ -118,6 +118,15 @@ class Head(nn.Module):
     
     def forward(self, x):
         B,T,C = x.shape
+        q = self.query(x)
+        k = self.query(x)
+
+        wts = q @ k.Transpose(-2,-1) * C**-0.5 # B,T,C @ B,C,T --> B,T,T
+        wts = wts.masked_fill(self.tril[:T,:T]==0, float('-inf')) #B,T,T
+        wts = F.softmax(wts, dim=-1) #B,T,T
+
+        v = self.value(x) #B,T,C
+        out = wts @ v #B,T,C
 
         return out
 
@@ -130,6 +139,7 @@ class BigramLanguageModel(nn.Module):
         #each token directly reads the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
         self.pos_embedding_table = nn.Embedding(block_size, n_embed)
+        self.sa_head = Head(n_embed)
         self.lm_head = nn.Linear(n_embed, vocab_size)
 
     def forward(self, idx, targets=None):
@@ -138,6 +148,7 @@ class BigramLanguageModel(nn.Module):
         token_emb = self.token_embedding_table(idx) # (Batch=batch_size, Time=block_size, Channel=embed_size)
         pos_emb = self.position_embedding_table(torch.arange(T)) #(T,C)
         x = token_emb + pos_emb
+        x = self.sa_head(x)
         logits = self.lm_head(x) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
 
         if targets is not None:
@@ -155,8 +166,11 @@ class BigramLanguageModel(nn.Module):
     def generate(self, idx, max_new_tokens):
         # idx is B,T array in current context
         for _ in range(max_new_tokens):
+
+            #crop idx to last block_size tokens
+            idx_cond = idx[:, -block_size:]
             #get the preds
-            logits, loss = self(idx)
+            logits, loss = self(idx_cond)
             #get the last time step
             logits = logits[:, -1, :] # B,C
             #apply softmax to get probabilities
