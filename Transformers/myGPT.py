@@ -15,6 +15,7 @@ learning_rate=1e-3
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters=200
 n_embed = 32
+num_heads = 4
 
 
 
@@ -121,7 +122,7 @@ class Head(nn.Module):
         q = self.query(x)
         k = self.query(x)
 
-        wts = q @ k.Transpose(-2,-1) * C**-0.5 # B,T,C @ B,C,T --> B,T,T
+        wts = q @ k.transpose(-2,-1) * C**-0.5 # B,T,C @ B,C,T --> B,T,T
         wts = wts.masked_fill(self.tril[:T,:T]==0, float('-inf')) #B,T,T
         wts = F.softmax(wts, dim=-1) #B,T,T
 
@@ -129,6 +130,16 @@ class Head(nn.Module):
         out = wts @ v #B,T,C
 
         return out
+
+class MultiHeads(nn.Module):
+
+    def __init__(self, num_heads, head_size):
+        super().__init__()
+        self.multihead = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
+
+    def forward(self, x):
+        return torch.cat([h(x) for h in self.multihead], dim=-1)
+        
 
 #BiGram Language Model
 class BigramLanguageModel(nn.Module):
@@ -139,14 +150,16 @@ class BigramLanguageModel(nn.Module):
         #each token directly reads the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
         self.pos_embedding_table = nn.Embedding(block_size, n_embed)
-        self.sa_head = Head(n_embed)
+        self.sa_head = MultiHeads(num_heads, n_embed//num_heads)
         self.lm_head = nn.Linear(n_embed, vocab_size)
 
     def forward(self, idx, targets=None):
 
+        B,T = idx.shape
+
         #idx and targets are both (Batch ,Time) tensor of integers
         token_emb = self.token_embedding_table(idx) # (Batch=batch_size, Time=block_size, Channel=embed_size)
-        pos_emb = self.position_embedding_table(torch.arange(T)) #(T,C)
+        pos_emb = self.pos_embedding_table(torch.arange(T)) #(T,C)
         x = token_emb + pos_emb
         x = self.sa_head(x)
         logits = self.lm_head(x) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
