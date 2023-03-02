@@ -153,6 +153,14 @@ class FeedForward(nn.Module):
     def forward(self, x):
         return self.net(x)
 
+#Multiple blocks of decoder
+class Block(nn.Module):
+
+    def __init__(self, n_embed, n_head):
+        super().__init__()
+        
+
+
 #BiGram Language Model
 class BigramLanguageModel(nn.Module):
 
