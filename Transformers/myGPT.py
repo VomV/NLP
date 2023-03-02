@@ -140,6 +140,18 @@ class MultiHeads(nn.Module):
     def forward(self, x):
         return torch.cat([h(x) for h in self.multihead], dim=-1)
         
+#After self attention is completed, each token contains contextual info, and now with feedforward each token can think on itself, 
+class FeedForward(nn.Module):
+
+    def __init__(self, n_embed):
+        super().__init__()
+        self.net = nn.Sequential(
+                            nn.Linear(n_embed, n_embed),
+                            nn.ReLU()
+        )
+
+    def forward(self, x):
+        return self.net(x)
 
 #BiGram Language Model
 class BigramLanguageModel(nn.Module):
@@ -151,6 +163,7 @@ class BigramLanguageModel(nn.Module):
         self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
         self.pos_embedding_table = nn.Embedding(block_size, n_embed)
         self.sa_head = MultiHeads(num_heads, n_embed//num_heads)
+        self.ffd = FeedForward(n_embed)
         self.lm_head = nn.Linear(n_embed, vocab_size)
 
     def forward(self, idx, targets=None):
@@ -162,6 +175,7 @@ class BigramLanguageModel(nn.Module):
         pos_emb = self.pos_embedding_table(torch.arange(T)) #(T,C)
         x = token_emb + pos_emb
         x = self.sa_head(x)
+        x = self.ffd(x)
         logits = self.lm_head(x) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
 
         if targets is not None:
