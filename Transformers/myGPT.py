@@ -167,11 +167,13 @@ class Block(nn.Module):
         head_size = n_embed // n_head
         self.sa = MultiHeads(n_head, head_size)
         self.ffd = FeedForward(n_embed)
+        self.ln1 = nn.LayerNorm(n_embed)
+        self.ln2 = nn.LayerNorm(n_embed)
 
     def forward(self, x):
 
-        x = x + self.sa(x) #x is added back for residual connection or skip connection
-        x = x + self.ffd(x)
+        x = x + self.sa(self.ln1(x)) #x is added back for residual connection or skip connection
+        x = x + self.ffd(self.ln2(x))
         return x
 
 
@@ -188,6 +190,7 @@ class BigramLanguageModel(nn.Module):
                             Block(n_embed, n_head=4),
                             Block(n_embed, n_head=4),
                             Block(n_embed, n_head=4),
+                            nn.LayerNorm(n_embed)
 
 
         )
