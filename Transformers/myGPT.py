@@ -136,9 +136,12 @@ class MultiHeads(nn.Module):
     def __init__(self, num_heads, head_size):
         super().__init__()
         self.multihead = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
+        self.proj = nn.Linear(n_embed, n_embed)
 
     def forward(self, x):
-        return torch.cat([h(x) for h in self.multihead], dim=-1)
+        out = torch.cat([h(x) for h in self.multihead], dim=-1)
+        out = self.proj(out)
+        return out 
         
 #After self attention is completed, each token contains contextual info, and now with feedforward each token can think on itself, 
 class FeedForward(nn.Module):
@@ -146,8 +149,11 @@ class FeedForward(nn.Module):
     def __init__(self, n_embed):
         super().__init__()
         self.net = nn.Sequential(
-                            nn.Linear(n_embed, n_embed),
-                            nn.ReLU()
+                            nn.Linear(n_embed, 4* n_embed), #mul by 4 as per attn paper
+                            nn.ReLU(),
+                            nn.Linear(4* n_embed, n_embed),
+
+
         )
 
     def forward(self, x):
@@ -164,8 +170,8 @@ class Block(nn.Module):
 
     def forward(self, x):
 
-        x = self.sa(x)
-        x = self.ffd(x)
+        x = x + self.sa(x) #x is added back for residual connection or skip connection
+        x = x + self.ffd(x)
         return x
 
 
@@ -199,7 +205,7 @@ class BigramLanguageModel(nn.Module):
         x = token_emb + pos_emb
 
         x = self.blocks(x)
-        
+
         # x = self.sa_head(x)
         # x = self.ffd(x)
         logits = self.lm_head(x) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
