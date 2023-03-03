@@ -158,7 +158,15 @@ class Block(nn.Module):
 
     def __init__(self, n_embed, n_head):
         super().__init__()
-        
+        head_size = n_embed // n_head
+        self.sa = MultiHeads(n_head, head_size)
+        self.ffd = FeedForward(n_embed)
+
+    def forward(self, x):
+
+        x = self.sa(x)
+        x = self.ffd(x)
+        return x
 
 
 #BiGram Language Model
@@ -170,8 +178,15 @@ class BigramLanguageModel(nn.Module):
         #each token directly reads the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
         self.pos_embedding_table = nn.Embedding(block_size, n_embed)
-        self.sa_head = MultiHeads(num_heads, n_embed//num_heads)
-        self.ffd = FeedForward(n_embed)
+        self.blocks = nn.Sequential(
+                            Block(n_embed, n_head=4),
+                            Block(n_embed, n_head=4),
+                            Block(n_embed, n_head=4),
+
+
+        )
+        # self.sa_head = MultiHeads(num_heads, n_embed//num_heads)
+        # self.ffd = FeedForward(n_embed)
         self.lm_head = nn.Linear(n_embed, vocab_size)
 
     def forward(self, idx, targets=None):
@@ -182,8 +197,11 @@ class BigramLanguageModel(nn.Module):
         token_emb = self.token_embedding_table(idx) # (Batch=batch_size, Time=block_size, Channel=embed_size)
         pos_emb = self.pos_embedding_table(torch.arange(T)) #(T,C)
         x = token_emb + pos_emb
-        x = self.sa_head(x)
-        x = self.ffd(x)
+
+        x = self.blocks(x)
+        
+        # x = self.sa_head(x)
+        # x = self.ffd(x)
         logits = self.lm_head(x) #(Batch=batch_size, Time=block_size, Channel=vocab_size)
 
         if targets is not None:
