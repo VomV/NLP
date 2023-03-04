@@ -3,6 +3,10 @@
 *.xlsx
 *.pdf
 *.pt
+*.pth
+*.txt*
+*.chk
+*.model
 models/
 __pycache__/
 data/
