@@ -168,6 +168,8 @@ class FeedForward(nn.Module):
 #Multiple blocks of decoder
 class Block(nn.Module):
 
+    '''Transformer block: communicates followed by computation'''
+
     def __init__(self, n_embed, n_head):
         super().__init__()
         head_size = n_embed // n_head
