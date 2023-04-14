@@ -173,8 +173,8 @@ class Block(nn.Module):
     def __init__(self, n_embed, n_head):
         super().__init__()
         head_size = n_embed // n_head
-        self.sa = MultiHeads(n_head, head_size)
-        self.ffd = FeedForward(n_embed)
+        self.sa = MultiHeads(n_head, head_size) #communication
+        self.ffd = FeedForward(n_embed) #computation
         self.ln1 = nn.LayerNorm(n_embed)
         self.ln2 = nn.LayerNorm(n_embed)
 
