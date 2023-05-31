@@ -42,7 +42,7 @@ text_int = {ch:i for i, ch in enumerate(chars)}
 int_text = {i:ch for i, ch in enumerate(chars)}
 
 
-
+#Encode the data
 encode = lambda x: [text_int[i] for i in x]
 decode  = lambda x: ''.join([int_text[i] for i in x])
 encode('hi there')
