@@ -1,10 +1,8 @@
 # !wget https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
 
-
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-
 
 #hyperparameters
 batch_size=64 #how many independent seq to process in parallel
@@ -12,13 +10,13 @@ block_size=256 #sets the size of the context
 max_iters=5000
 eval_interval=500
 learning_rate=3e-4
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters = 200
 n_embed = 384
 num_heads = 6
 n_layer = 6
 dropout = 0.2
-
 
 
 torch.manual_seed(42)
