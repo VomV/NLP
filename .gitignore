@@ -11,3 +11,7 @@ models/
 __pycache__/
 data/
 *.sh
+
+*
+Cookbooks/layoutlm-funsd/logs/
+Cookbooks/layoutlm-funsd/logs/runs/
