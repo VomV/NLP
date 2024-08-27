@@ -15,3 +15,4 @@ data/
 *
 Cookbooks/layoutlm-funsd/logs/
 Cookbooks/layoutlm-funsd/logs/runs/
+.DS_Store
