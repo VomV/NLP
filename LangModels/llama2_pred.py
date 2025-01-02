@@ -23,3 +23,4 @@ sequences = pipeline(
     max_length=200,)
 for seq in sequences:
     print(f"Result: {seq['generated_text']}")
+
