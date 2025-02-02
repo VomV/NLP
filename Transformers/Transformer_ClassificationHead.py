@@ -5,6 +5,8 @@ from torch import nn
 import Transformer_FullEncoderLayer as el
 from transformers import AutoConfig, AutoTokenizer
 
+
+
 class TransformerForSequenceClassification(nn.Module):
 
     def __init__(self, config):
