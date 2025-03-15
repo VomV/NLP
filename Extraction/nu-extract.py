@@ -4,7 +4,8 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-def predict_NuExtract(model, tokenizer, texts, template, batch_size=1, max_length=10000, max_new_tokens=4000):
+def predict_NuExtract(model, tokenizer, texts, template, 
+                      batch_size=1, max_length=10000, max_new_tokens=4000):
 
     template = json.dumps(json.loads(template), indent=4)
 
@@ -59,4 +60,5 @@ template = """{
 
 prediction = predict_NuExtract(model, tokenizer, [text], template)[0]
 
+print(list(prediction))
 print(prediction)
