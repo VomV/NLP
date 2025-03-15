@@ -60,5 +60,6 @@ template = """{
 
 prediction = predict_NuExtract(model, tokenizer, [text], template)[0]
 
-print(list(prediction))
 print(prediction)
+
+print(prediction["Model"])
