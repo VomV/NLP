@@ -1,5 +1,5 @@
 ### Adding a Classification Head on top of an Encoder layer
-### Classification is done based on the hidden state of the CLS token 
+### Classification is done based on the hidden state of the CLS token...
 
 from torch import nn
 import Transformer_FullEncoderLayer as el
