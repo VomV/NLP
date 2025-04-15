@@ -1,6 +1,7 @@
 """
 DocChat:::
 
+
 Conversational interface that integrates with LlamaIndex and OpenAI's GPT-3.5. 
 Users can ask questions about LlamaIndex Docs, and the application provides relevant answers. 
 ...
