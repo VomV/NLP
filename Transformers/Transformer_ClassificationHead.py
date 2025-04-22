@@ -3,7 +3,7 @@
 
 
 
-### Classification is done based on the hidden state of the CLS token...
+### Classification is done based on the hidden state of the CLS token......
 
 
 from torch import nn
