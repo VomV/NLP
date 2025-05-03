@@ -1,7 +1,7 @@
 """
 Knowledge Ingestion of the markdown files in the docs folder of the llama_index repository:
 - https://github.com/jerryjliu/llama_index
-
+...
 Built with LlamaIndex, GithubRepositoryReader, and OpenAI.
 
 """
